@@ -97,9 +97,9 @@ sys_cs(void){
 
 int
 sys_trace(){
-  int track;
-  if(argint(0, &track) < 0)
+  int trackingActive;
+  if(argint(0, &trackingActive) < 0)
     return -1;
 
-  return trace(track);
+  return trace(trackingActive);
 }
