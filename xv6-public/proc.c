@@ -165,7 +165,7 @@ growproc(int n)
 
   curproc->numberSysCalls = curproc->numberSysCalls +1;
   if(curproc->trackingActive)
-    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: WAIT" , curproc->pid,curproc->name,curproc->numberSysCalls);
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: GROWPROC\n" , curproc->pid,curproc->name,curproc->numberSysCalls);
   sz = curproc->sz;
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
@@ -239,7 +239,7 @@ exit(void)
 
   curproc->numberSysCalls = curproc->numberSysCalls +1;
   if(curproc->trackingActive)
-    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: WAIT" , curproc->pid,curproc->name,curproc->numberSysCalls);
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: EXIT\n" , curproc->pid,curproc->name,curproc->numberSysCalls);
   if(curproc == initproc)
     panic("init exiting");
 
@@ -286,7 +286,7 @@ wait(void)
   struct proc *curproc = myproc();
   curproc->numberSysCalls = curproc->numberSysCalls +1;
   if(curproc->trackingActive)
-    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: WAIT" , curproc->pid,curproc->name,curproc->numberSysCalls);
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: WAIT\n" , curproc->pid,curproc->name,curproc->numberSysCalls);
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited children.
@@ -399,7 +399,7 @@ yield(void)
   myproc()->state = RUNNABLE;
   myproc()->numberSysCalls = myproc()->numberSysCalls+1;
   if(myproc()->trackingActive)
-    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: YIELD" , myproc()->pid,myproc()->name,myproc()->numberSysCalls);
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: YIELD\n" , myproc()->pid,myproc()->name,myproc()->numberSysCalls);
   sched();
   release(&ptable.lock);
 }
@@ -435,7 +435,7 @@ sleep(void *chan, struct spinlock *lk)
   p->numberSysCalls = p->numberSysCalls +1;
   p->numberChangeContext = p->numberChangeContext +1;
   if(p->trackingActive)
-    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: SLEEP" , p->pid,p->name,p->numberSysCalls);
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: SLEEP\n" , p->pid,p->name,p->numberSysCalls);
   if(p == 0)
     panic("sleep");
 
@@ -478,9 +478,9 @@ wakeup1(void *chan)
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if(p->state == SLEEPING && p->chan == chan){
-      if(p->trackingActive)
-        cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: WAKE" , p->pid,p->name,p->numberSysCalls);
       p->numberSysCalls = p->numberSysCalls +1;
+      if(p->trackingActive)
+        cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: WAKE\n" , p->pid,p->name,p->numberSysCalls);
       p->state = RUNNABLE;
     }
 }
@@ -505,9 +505,9 @@ kill(int pid)
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid == pid){
-      if(p->trackingActive)
-        cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: KILL" , p->pid,p->name,p->numberSysCalls);
       p->numberSysCalls = p->numberSysCalls +1;
+      if(p->trackingActive)
+        cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: KILL\n" , p->pid,p->name,p->numberSysCalls);
       p->killed = 1;
       // Wake process from sleep if necessary.
       if(p->state == SLEEPING)
@@ -559,10 +559,10 @@ procdump(void)
 
 int
 trace(int trackingActive){
-  if(myproc()->trackingActive)
-    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: TRACE" , myproc()->pid,myproc()->name,myproc()->numberSysCalls);
-
   myproc()->numberSysCalls = myproc()->numberSysCalls +1;
   myproc()->trackingActive = trackingActive;
+  if(myproc()->trackingActive)
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: TRACE\n" , myproc()->pid,myproc()->name,myproc()->numberSysCalls);
+
   return 0;
 }
