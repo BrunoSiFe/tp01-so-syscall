@@ -190,6 +190,9 @@ fork(void)
   struct proc *curproc = myproc();
 
   curproc->numberSysCalls = curproc->numberSysCalls +1;
+
+  if(curproc->trackingActive)
+    cprintf("ID: %d NOME: %s NUM_CALL: %d CALL_NAME: FORK\n" , curproc->pid,curproc->name,curproc->numberSysCalls);
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
